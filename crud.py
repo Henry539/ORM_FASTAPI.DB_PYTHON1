@@ -8,15 +8,15 @@ def get_user(db: Session, user_id: int):
 
 
 def get_user_by_name(db: Session, username: str):
-    return db.query(models.User).filter(models.User.USERNAME == username).first()
-
+    data = db.query(models.User).filter(models.User.USERNAME == username).first()
+    return data
 
 def get_all_users(db, skip: int, limit: int):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
 def get_datauser(db: Session, user_id: int):
-    return db.query(models.DataUser).filter(models.DataUser.USER_ID == user_id).first()
+    return db.query(models.DataUser).filter(models.DataUser.USER_ID == user_id).all()
 
 
 def create_user(db: Session, username: str, password: str):
@@ -33,3 +33,4 @@ def create_datauser(db: Session, full_name: str, age: int, sex: str, phone: int,
     db.commit()
     db.refresh(db_datauser)
     return db_datauser
+

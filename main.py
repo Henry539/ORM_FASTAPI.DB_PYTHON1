@@ -31,24 +31,31 @@ def create(request: Request):
     return templates.TemplateResponse("create_user.html", {"request": request})
 
 #USER LOGIN SUCCESS
-@app.get("/private", response_class=HTMLResponse)
+@app.get("/private/{username}", response_class=HTMLResponse)
 def user_checked(username: str, request: Request):
-    return templates.TemplateResponse("hello.html", {"request": request,"username": username.upper()})
+    return templates.TemplateResponse("hello.html", {"request": request,"username": username})
 
 
-@app.get("/user_name/{username}", response_model=schemas.User)
+@app.get("/user_name/{username}", response_model = schemas.User)
 def read_user_by_name(username: str, db: Session = Depends(get_db)):
     data_user = crud.get_user_by_name(db, username)
-    if data_user: return data_user
+    if data_user:
+        return data_user
     raise HTTPException(status_code=404)
 
+@app.get("/private/{username}/done", response_class=HTMLResponse)
+def user_check_done(username: str, request: Request):
+    return templates.TemplateResponse("hello-done.html", {"request": request,"username": username})
 
-@app.get("/user_id/{user_id}", response_model=schemas.User)
-def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
-    data_user = crud.get_user(db, user_id)
-    if data_user: return data_user
-    raise HTTPException(status_code=404)
 
+@app.get("/private/{username}/data", response_class=HTMLResponse)
+def read_data_users(username: str, request: Request):
+    return templates.TemplateResponse("create_datauser.html", {"request": request, "username": username})
+
+
+@app.get("/private/{username}/data/update", response_class=HTMLResponse)
+def user_update_form(username: str, request: Request):
+    return templates.TemplateResponse("update_datauser.html", {"request": request,"username": username})
 
 @app.get("/users", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db), skip: Optional[int] = 0, limit: Optional[int] = 100):
@@ -67,15 +74,15 @@ def check_user(username: str = Form(None), password: str = Form(None),db: Sessio
             checkPass = True
 
     if checkUser and checkPass:
-        return RedirectResponse(url=f"/private?username={username}", status_code=302)
+        if data_user.DATA_USER != []:
+            return RedirectResponse(url=f"/private/{username}/done", status_code=302)
+        return RedirectResponse(url=f"/private/{username}", status_code=302)
     return RedirectResponse(url="/try-back")
 
-#USER LOGIN REBACK
+
 @app.post("/try-back", response_class=HTMLResponse)
 def login_again(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
-
 
 
 @app.post("/create-user", response_model=schemas.UserCreate)
@@ -86,21 +93,34 @@ def create_user(username: str = Form(...), password: str = Form(...), db: Sessio
     return RedirectResponse(url="/", status_code=302)
 
 
-@app.post("/user/data", response_model=schemas.DataUser)
-def create_dateUser(*, user_id: int = Query(None, description="Choose 1 in UserID or UserName"),
-                    user_name: str = Query(None, description="Choose 1 in UserID or UserName"), full_name: str,
-                    age: int, sex: str, phone: int, db: Session = Depends(get_db)):
-    if user_name != None and user_id == None:
-        data_return = crud.get_user_by_name(db=db, username=user_name)
-        if data_return: return crud.create_datauser(db=db, full_name=full_name, age=age, sex=sex, phone=phone,
-                                                    user_id=data_return.ID)
-        raise HTTPException(status_code=403)
-    elif user_id != None and user_name == None:
-        data_return = crud.get_user(db=db, user_id=user_id)
-        if data_return: return crud.create_datauser(db=db, full_name=full_name, age=age, sex=sex, phone=phone,
-                                                    user_id=user_id)
-        raise HTTPException(status_code=403)
-    raise HTTPException(status_code=404)
+@app.post("/create-datauser/{username}")
+def create_dateUser(*,username: str, full_name: str = Form(...),
+                    age: int = Form(...), sex: str = Form(...), phone: int = Form(...), db: Session = Depends(get_db)):
+
+    data_return = crud.get_user_by_name(db=db, username=username)
+    crud.create_datauser(db=db, full_name=full_name, age=age, sex=sex, phone=phone, user_id=data_return.ID)
+    return RedirectResponse(url=f"/private/{username}/done", status_code=302)
+
+@app.post("/update-datauser/{username}")
+def create_dateUser(*,username: str, full_name: str = Form(None),
+                    age: int = Form(None), sex: str = Form(None), phone: int = Form(None), db: Session = Depends(get_db)):
+    data_return = crud.get_user_by_name(db=db, username=username)
+    data_user_return = crud.get_datauser(db=db, user_id=data_return.ID)
+    update= data_user_return[-1]
+    if full_name == None:
+        full_name = update.FULLNAME
+    if sex == None:
+        sex = update.SEX
+    if age == None:
+        age = update.AGE
+    if phone == None:
+        phone = update.PHONE
+    crud.create_datauser(db=db, full_name=full_name, age=age, sex=sex, phone=phone, user_id=data_return.ID)
+
+    return RedirectResponse(url=f"/private/{username}/done", status_code=302)
+
+
+
 
 
 

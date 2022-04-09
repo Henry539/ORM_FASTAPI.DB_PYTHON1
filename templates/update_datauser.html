@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Data User</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+<h2>Update Data User</h2><br>
+<div class="login">
+    <form id="login" method="post" action="/update-datauser/{{username}}">
+        <label><b>User Name
+        </b>
+        </label>
+        <input type="text" name="username" value="{{username}}">
+            <br><br>
+            <label><b>Full Name
+            </b>
+            </label>
+            <input type="text" name="full_name" placeholder="Fullname">
+            <br><br>
+            <label><b>Age
+            </b>
+            </label>
+            <input type="number" name="age" placeholder="Age">
+            <br><br>
+            <label><b>Sex
+            </b>
+                <br>
+            </label>
+            <input type="radio" name="sex" value="Male"> Male<br>
+            <input type="radio" name="sex" value="Female">Female<br>
+            <br><br>
+            <label><b>Phone
+            </b>
+            </label>
+            <input type="number" name="phone" placeholder="Phone">
+            <br><br>
+            <input type="submit" value="Update DataUser">
+    </form>
+</div>
+</body>
+</html>
