@@ -120,9 +120,5 @@ def create_dateUser(*,username: str, full_name: str = Form(None),
     return RedirectResponse(url=f"/private/{username}/done", status_code=302)
 
 
-
-
-
-
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8002)
