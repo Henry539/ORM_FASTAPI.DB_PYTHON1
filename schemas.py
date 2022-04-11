@@ -7,7 +7,7 @@ class DataCreate(BaseModel):
     FULLNAME: str
     AGE: int
     SEX: str
-    PHONE: int
+    PHONE: str
 
 
 class DataUser(DataCreate):

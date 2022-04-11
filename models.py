@@ -22,7 +22,7 @@ class DataUser(Base):
     FULLNAME = Column(String, index=True)
     AGE = Column(Integer, index=True)
     SEX = Column(Integer, index=True)
-    PHONE = Column(Integer, index=True)
+    PHONE = Column(String, index=True)
     USER_ID = Column(Integer, ForeignKey("USERS.ID"))
 
     OWNER = relationship("User", back_populates="DATA_USER")

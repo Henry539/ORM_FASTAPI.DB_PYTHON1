@@ -11,13 +11,16 @@ def get_user_by_name(db: Session, username: str):
     data = db.query(models.User).filter(models.User.USERNAME == username).first()
     return data
 
-def get_all_users(db, skip: int, limit: int):
+def get_all_users(db: Session, skip: int, limit: int):
     return db.query(models.User).offset(skip).limit(limit).all()
+
+def get_all_datausers(db: Session, skip: int, limit: int):
+    return db.query(models.DataUser).offset(skip).limit(limit).all()
+
 
 
 def get_datauser(db: Session, user_id: int):
     return db.query(models.DataUser).filter(models.DataUser.USER_ID == user_id).all()
-
 
 def create_user(db: Session, username: str, password: str):
     db_user = models.User(USERNAME=username, PASSWORD=password)
